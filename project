@@ -1,0 +1,53 @@
+import hou
+import os
+
+# from hutil.Qt import QtWidgets, QtUiTools
+from PySide2 import QtWidgets, QtUiTools
+
+
+class ProjectManager(QtWidgets.QWidget):
+
+    def __init__(self):
+        super(ProjectManager, self).__init__()
+
+        self.proj = hou.getenv('JOB') + '/'
+
+        # load UI
+        loader = QtUiTools.QUiLoader()
+        self.ui = loader.load(r'C:\Users\maste\Documents\houdini18.5\scripts\python\projman\projman.ui')
+
+        # create widget
+        self.btn = QtWidgets.QPushButton("Click Me")
+        self.lblTitle = QtWidgets.QLabel("Project Manager")
+        self.label = QtWidgets.QLabel(self.proj)
+
+        self.listwidget = QtWidgets.QListWidget()
+
+        self.createInterface()
+
+        # layout
+        mainLayout = QtWidgets.QVBoxLayout()
+        mainLayout.addWidget(self.ui)
+
+        # Add widgets to layout
+        # mainLayout.addWidget(self.lblTitle)
+        # mainLayout.addWidget(self.label)
+        # mainLayout.addWidget(self.listwidget)
+        # mainLayout.addWidget(self.btn)
+
+        self.setLayout(mainLayout)
+
+    def openSence(self, item):
+        print("open hip file")
+        hipFile = self.proj + item.data()
+        # print hipFile
+        hou.hipFile.load(hipFile)
+
+    def createInterface(self):
+
+        for file in os.listdir(self.proj):
+            if file.endswith(".hip"):
+                self.listwidget.addItem(file)
+
+        # connect list item to function
+        self.listwidget.doubleClicked.connect(self.openSence)
